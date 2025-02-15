@@ -1,14 +1,14 @@
 package org.example;
 
 class Fraction {
-    int numerator;
-    int denominator;
+    long numerator;
+    long denominator;
 
-    Fraction(int numerator, int denominator) {
+    Fraction(long numerator, long denominator) {
         if (denominator == 0) {
             throw new IllegalArgumentException("Denominator cannot be zero.");
         }
-        int gcd = gcd(Math.abs(numerator), Math.abs(denominator));
+        long gcd = gcd(Math.abs(numerator), Math.abs(denominator));
         this.numerator = numerator / gcd;
         this.denominator = denominator / gcd;
         if (this.denominator < 0) {
@@ -18,20 +18,20 @@ class Fraction {
     }
 
     Fraction add(Fraction other) {
-        int num = this.numerator * other.denominator + other.numerator * this.denominator;
-        int den = this.denominator * other.denominator;
+        long num = this.numerator * other.denominator + other.numerator * this.denominator;
+        long den = this.denominator * other.denominator;
         return new Fraction(num, den);
     }
 
     Fraction subtract(Fraction other) {
-        int num = this.numerator * other.denominator - other.numerator * this.denominator;
-        int den = this.denominator * other.denominator;
+        long num = this.numerator * other.denominator - other.numerator * this.denominator;
+        long den = this.denominator * other.denominator;
         return new Fraction(num, den);
     }
 
     Fraction multiply(Fraction other) {
-        int num = this.numerator * other.numerator;
-        int den = this.denominator * other.denominator;
+        long num = this.numerator * other.numerator;
+        long den = this.denominator * other.denominator;
         return new Fraction(num, den);
     }
 
@@ -39,22 +39,27 @@ class Fraction {
         if (other.numerator == 0) {
             throw new IllegalArgumentException("Cannot divide by zero.");
         }
-        int num = this.numerator * other.denominator;
-        int den = this.denominator * other.numerator;
+        long num = this.numerator * other.denominator;
+        long den = this.denominator * other.numerator;
         return new Fraction(num, den);
+    }
+
+    public boolean equals(double num) {
+        double den = this.numerator * this.denominator;
+        return den == num;
     }
 
     @Override
     public String toString() {
         if (denominator == 1) {
-            return Integer.toString(numerator);
+            return Long.toString(numerator);
         }
         return numerator + "/" + denominator;
     }
 
-    private int gcd(int a, int b) {
+    private long gcd(long a, long b) {
         while (b != 0) {
-            int temp = b;
+            long temp = b;
             b = a % b;
             a = temp;
         }
