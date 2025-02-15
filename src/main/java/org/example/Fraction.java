@@ -65,4 +65,9 @@ class Fraction {
         }
         return a;
     }
+
+    public Fraction negate() {
+        this.numerator *= -1;
+        return this;
+    }
 }
