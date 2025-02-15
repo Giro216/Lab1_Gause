@@ -109,69 +109,79 @@ public class GaussJordan {
         int m = matrix.length;
         int n = matrix[0].length - 1;
 
+        // Проверка на отсутствие решений
         for (int row = 0; row < m; row++) {
-            boolean allZero = true;
-            for (int col = 0; col < n; col++) {
-                if (matrix[row][col].numerator != 0) {
-                    allZero = false;
-                    break;
-                }
-            }
-            if (allZero && matrix[row][n].numerator != 0) {
+            if (isZeroRow(matrix[row], n) && !matrix[row][n].equals(0.f)) {
                 System.out.println("The system has no solution.");
                 return;
             }
         }
 
+        // Проверка на бесконечное количество решений
+        boolean hasInfiniteSolutions = false;
         for (int row = 0; row < m; row++) {
-            boolean allZero = true;
-            for (int col = 0; col < n; col++) {
-                if (matrix[row][col].numerator != 0) {
-                    allZero = false;
-                    break;
-                }
-            }
-            if (allZero) {
-                System.out.println("The system has infinitely many solutions.");
-                PrintSystemSolution(matrix);
-                return;
+            if (isZeroRow(matrix[row], n)) {
+                hasInfiniteSolutions = true;
+                break;
             }
         }
 
-        System.out.println("The system has a unique solution:");
+        if (hasInfiniteSolutions) {
+            System.out.println("The system has infinitely many solutions.");
+            printInfiniteSolutions(matrix);
+        } else {
+            System.out.println("The system has a unique solution:");
+            printUniqueSolution(matrix);
+        }
+    }
+
+    // Проверка, является ли строка нулевой (исключая последний столбец)
+    private static boolean isZeroRow(Fraction[] row, int n) {
+        for (int col = 0; col < n; col++) {
+            if (!row[col].equals(0.f)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Вывод уникального решения
+    private static void printUniqueSolution(Fraction[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length - 1;
+
         for (int row = 0; row < m; row++) {
             System.out.println("x" + (row + 1) + " = " + matrix[row][n]);
         }
     }
 
-    private static void PrintSystemSolution(Fraction[][] matrix) {
+    // Вывод решения в случае бесконечного количества решений
+    private static void printInfiniteSolutions(Fraction[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
         for (int row = 0; row < rows; row++) {
-            ArrayList<Fraction> coefficients = new ArrayList<>(cols);
-            int num_index = -1;
-            for (int col = 0; col < cols; col++) {
-                coefficients.add(matrix[row][col]);
-                if (matrix[row][col].equals(1.f) && num_index == -1) num_index = col;
-            }
-
-            if (num_index != -1) {
-                System.out.print("X" + (num_index + 1) + " = ");
-                for (int index = 0; index < coefficients.size(); index++) {
-                    if (index != num_index && !coefficients.get(index).toString().equals("0")) {
-                        if (index != coefficients.size() - 1){
-                            coefficients.get(index).numerator *= -1;
-                            System.out.print(coefficients.get(index).toString() + " * X" + (index + 1) + " + ");
-                        }else{
-                            System.out.println(coefficients.get(index).toString());
-                        }
-                    }else if (coefficients.get(index).toString().equals("0") && index == coefficients.size() - 1) {
-                        System.out.println(coefficients.get(index).toString());
+            int pivotCol = findPivotColumn(matrix[row], cols - 1);
+            if (pivotCol != -1) {
+                System.out.print("X" + (pivotCol + 1) + " = ");
+                for (int col = 0; col < cols - 1; col++) {
+                    if (col != pivotCol && !matrix[row][col].equals(0.f)) {
+                        Fraction coefficient = matrix[row][col].negate(); // Умножаем на -1
+                        System.out.print(coefficient + " * X" + (col + 1) + " + ");
                     }
                 }
+                System.out.println(matrix[row][cols - 1]); // Свободный член
             }
-
         }
+    }
+
+    // Поиск ведущего столбца (первого ненулевого элемента)
+    private static int findPivotColumn(Fraction[] row, int n) {
+        for (int col = 0; col < n; col++) {
+            if (row[col].equals(1.f)) {
+                return col;
+            }
+        }
+        return -1;
     }
 }
