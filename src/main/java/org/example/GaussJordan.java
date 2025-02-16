@@ -6,8 +6,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GaussJordan {
+    private boolean FindBasic = false;
+
     // Конструктор для считывания матрицы из файла
-    public GaussJordan() throws FileNotFoundException {
+    public GaussJordan(boolean FindBasic) throws FileNotFoundException {
+        this.FindBasic = FindBasic;
+
         Scanner scanner = new Scanner(new File("src/main/resources/input.txt"));
         int m = scanner.nextInt();
         int n = scanner.nextInt();
@@ -26,12 +30,13 @@ public class GaussJordan {
     }
 
     // Перегруженный конструктор для передачи матрицы напрямую
-    public GaussJordan(Fraction[][] matrix) {
+    public GaussJordan(Fraction[][] matrix, boolean FindBasic) {
+        this.FindBasic = FindBasic;
         printMatrix(matrix);
         solve(matrix);
     }
 
-    private static void solve(Fraction[][] matrix) {
+    private void solve(Fraction[][] matrix) {
         int m = matrix.length;
         int n = matrix[0].length - 1;
 
@@ -88,7 +93,7 @@ public class GaussJordan {
             pivotCol++;
 
             // Вывод промежуточной матрицы
-            printMatrix(matrix);
+            if (FindBasic) printMatrix(matrix);
         }
 
         // Приведение матрицы к упрощенному виду
@@ -102,10 +107,10 @@ public class GaussJordan {
         // Вывод решения
         printSolution(matrix);
 
-
+        if (FindBasic) new BasisSolutions(matrix);
     }
 
-    private static void printMatrix(Fraction[][] matrix) {
+    public static void printMatrix(Fraction[][] matrix) {
         for (Fraction[] row : matrix) {
             for (Fraction elem : row) {
                 System.out.print(elem + " ");
@@ -146,7 +151,7 @@ public class GaussJordan {
     }
 
     // Проверка, является ли строка нулевой (исключая последний столбец)
-    private static boolean isZeroRow(Fraction[] row, int n) {
+    public static boolean isZeroRow(Fraction[] row, int n) {
         for (int col = 0; col < n; col++) {
             if (!row[col].equals(0.f)) {
                 return false;
@@ -187,7 +192,7 @@ public class GaussJordan {
     }
 
     // Поиск ведущего столбца (первого ненулевого элемента)
-    private static int findPivotColumn(Fraction[] row, int n) {
+    public static int findPivotColumn(Fraction[] row, int n) {
         for (int col = 0; col < n; col++) {
             if (row[col].equals(1.f)) {
                 return col;

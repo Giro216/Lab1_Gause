@@ -6,6 +6,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {
-        new GaussJordan();
+        new GaussJordan(true);
     }
 }

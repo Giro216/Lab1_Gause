@@ -89,7 +89,6 @@ class Fraction {
     }
 
     public Fraction negate() {
-        this.numerator *= -1;
-        return this;
+        return new Fraction(-numerator, denominator);
     }
 }
