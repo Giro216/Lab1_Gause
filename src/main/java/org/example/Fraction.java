@@ -1,6 +1,6 @@
 package org.example;
 
-class Fraction {
+public class Fraction {
     long numerator;
     long denominator;
 

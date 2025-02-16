@@ -2,7 +2,6 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 abstract class LinearSystemSolver {
@@ -103,7 +102,7 @@ abstract class LinearSystemSolver {
         }
 
         // Вывод решения
-        printSolution(matrix);
+        printSolution();
 
         if (FindBasic) new BasisSolutions(matrix);
     }
@@ -118,11 +117,11 @@ abstract class LinearSystemSolver {
         System.out.println();
     }
 
-    protected abstract void printSolution(Fraction[][] matrix);
+    protected abstract void printSolution();
 
-    protected abstract void printUniqueSolution(Fraction[][] matrix);
+    protected abstract void printUniqueSolution();
 
-    protected abstract void printInfiniteSolutions(Fraction[][] matrix);
+    protected abstract void printInfiniteSolutions();
 
     // Поиск ведущего столбца (первого ненулевого элемента)
     public static int findPivotColumn(Fraction[] row, int n) {
@@ -153,19 +152,18 @@ public class GaussJordan extends LinearSystemSolver {
         solve();
     }
 
-    public GaussJordan(Fraction[][] matrix, boolean FindBasic) {
-        super(matrix, FindBasic);
+    public GaussJordan(Fraction[][] matrix1, boolean FindBasic) {
+        super(matrix1, FindBasic);
         solve();
     }
 
     @Override
-    protected void printSolution(Fraction[][] matrix) {
-        int m = matrix.length;
+    protected void printSolution() {
         int n = matrix[0].length - 1;
 
         // Проверка на отсутствие решений
-        for (int row = 0; row < m; row++) {
-            if (isZeroRow(matrix[row], n) && !matrix[row][n].equals(0.f)) {
+        for (Fraction[] fractions : matrix) {
+            if (isZeroRow(fractions, n) && !fractions[n].equals(0.f)) {
                 System.out.println("The system has no solution.");
                 return;
             }
@@ -173,8 +171,8 @@ public class GaussJordan extends LinearSystemSolver {
 
         // Проверка на бесконечное количество решений
         boolean hasInfiniteSolutions = false;
-        for (int row = 0; row < m; row++) {
-            if (isZeroRow(matrix[row], n)) {
+        for (Fraction[] fractions : matrix) {
+            if (isZeroRow(fractions, n)) {
                 hasInfiniteSolutions = true;
                 break;
             }
@@ -182,40 +180,38 @@ public class GaussJordan extends LinearSystemSolver {
 
         if (hasInfiniteSolutions) {
             System.out.println("The system has infinitely many solutions.");
-            printInfiniteSolutions(matrix);
+            printInfiniteSolutions();
         } else {
             System.out.println("The system has a unique solution:");
-            printUniqueSolution(matrix);
+            printUniqueSolution();
         }
     }
 
     @Override
-    protected void printUniqueSolution(Fraction[][] matrix) {
-        int m = matrix.length;
+    protected void printUniqueSolution() {
         int n = matrix[0].length - 1;
 
-        for (int row = 0; row < m; row++) {
-            int index = findPivotColumn(matrix[row], n);
-            System.out.println("x" + (index + 1) + " = " + matrix[row][n]);
+        for (Fraction[] fractions : matrix) {
+            int index = findPivotColumn(fractions, n);
+            System.out.println("x" + (index + 1) + " = " + fractions[n]);
         }
     }
 
     @Override
-    protected void printInfiniteSolutions(Fraction[][] matrix) {
-        int rows = matrix.length;
+    protected void printInfiniteSolutions() {
         int cols = matrix[0].length;
 
-        for (int row = 0; row < rows; row++) {
-            int pivotCol = findPivotColumn(matrix[row], cols - 1);
+        for (Fraction[] fractions : matrix) {
+            int pivotCol = findPivotColumn(fractions, cols - 1);
             if (pivotCol != -1) {
                 System.out.print("X" + (pivotCol + 1) + " = ");
                 for (int col = 0; col < cols - 1; col++) {
-                    if (col != pivotCol && !matrix[row][col].equals(0.f)) {
-                        Fraction coefficient = matrix[row][col].negate(); // Умножаем на -1
+                    if (col != pivotCol && !fractions[col].equals(0.f)) {
+                        Fraction coefficient = fractions[col].negate(); // Умножаем на -1
                         System.out.print(coefficient + " * X" + (col + 1) + " + ");
                     }
                 }
-                System.out.println(matrix[row][cols - 1]); // Свободный член
+                System.out.println(fractions[cols - 1]); // Свободный член
             }
         }
     }

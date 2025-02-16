@@ -6,8 +6,8 @@ public class BasisSolutions {
     private Fraction[][] matrix;
     private Fraction[][] basicMatrix;
     private int rows;
-    private int cols;
-    private List<List<Fraction>> Solutions;
+    private final int cols;
+    private final List<List<Fraction>> Solutions;
 
     BasisSolutions(Fraction[][] matrix) {
         this.matrix = matrix;
