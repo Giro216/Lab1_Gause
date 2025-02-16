@@ -6,20 +6,28 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GaussJordan {
+    // Конструктор для считывания матрицы из файла
     public GaussJordan() throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("src/main/resources/input.txt"));
         int m = scanner.nextInt();
         int n = scanner.nextInt();
         Fraction[][] matrix = new Fraction[m][n + 1];
 
+        // Считывание данных в виде строк для поддержки дробных значений
         for (int i = 0; i < m; i++) {
             for (int j = 0; j <= n; j++) {
-                matrix[i][j] = new Fraction(scanner.nextLong(), 1);
+                String token = scanner.next();
+                matrix[i][j] = Fraction.parse(token);
             }
         }
 
         printMatrix(matrix);
+        solve(matrix);
+    }
 
+    // Перегруженный конструктор для передачи матрицы напрямую
+    public GaussJordan(Fraction[][] matrix) {
+        printMatrix(matrix);
         solve(matrix);
     }
 
@@ -93,6 +101,8 @@ public class GaussJordan {
 
         // Вывод решения
         printSolution(matrix);
+
+
     }
 
     private static void printMatrix(Fraction[][] matrix) {
@@ -151,7 +161,8 @@ public class GaussJordan {
         int n = matrix[0].length - 1;
 
         for (int row = 0; row < m; row++) {
-            System.out.println("x" + (row + 1) + " = " + matrix[row][n]);
+            int index = findPivotColumn(matrix[row], n);
+            System.out.println("x" + (index + 1) + " = " + matrix[row][n]);
         }
     }
 
