@@ -5,17 +5,16 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class GaussJordan {
-    private boolean FindBasic = false;
+abstract class LinearSystemSolver {
+    protected boolean FindBasic;
+    protected Fraction[][] matrix;
 
-    // Конструктор для считывания матрицы из файла
-    public GaussJordan(boolean FindBasic) throws FileNotFoundException {
+    public LinearSystemSolver(boolean FindBasic) throws FileNotFoundException {
         this.FindBasic = FindBasic;
-
         Scanner scanner = new Scanner(new File("src/main/resources/input.txt"));
         int m = scanner.nextInt();
         int n = scanner.nextInt();
-        Fraction[][] matrix = new Fraction[m][n + 1];
+        matrix = new Fraction[m][n + 1];
 
         // Считывание данных в виде строк для поддержки дробных значений
         for (int i = 0; i < m; i++) {
@@ -26,17 +25,16 @@ public class GaussJordan {
         }
 
         printMatrix(matrix);
-        solve(matrix);
     }
 
     // Перегруженный конструктор для передачи матрицы напрямую
-    public GaussJordan(Fraction[][] matrix, boolean FindBasic) {
+    public LinearSystemSolver(Fraction[][] matrix1, boolean FindBasic) {
         this.FindBasic = FindBasic;
+        matrix = matrix1;
         printMatrix(matrix);
-        solve(matrix);
     }
 
-    private void solve(Fraction[][] matrix) {
+    protected void solve() {
         int m = matrix.length;
         int n = matrix[0].length - 1;
 
@@ -120,7 +118,48 @@ public class GaussJordan {
         System.out.println();
     }
 
-    private static void printSolution(Fraction[][] matrix) {
+    protected abstract void printSolution(Fraction[][] matrix);
+
+    protected abstract void printUniqueSolution(Fraction[][] matrix);
+
+    protected abstract void printInfiniteSolutions(Fraction[][] matrix);
+
+    // Поиск ведущего столбца (первого ненулевого элемента)
+    public static int findPivotColumn(Fraction[] row, int n) {
+        for (int col = 0; col < n; col++) {
+            if (row[col].equals(1.f)) {
+                return col;
+            }
+        }
+        return -1;
+    }
+
+    // Проверка, является ли строка нулевой (исключая последний столбец)
+    public static boolean isZeroRow(Fraction[] row, int n) {
+        for (int col = 0; col < n; col++) {
+            if (!row[col].equals(0.f)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+public class GaussJordan extends LinearSystemSolver {
+
+    public GaussJordan(boolean FindBasic) throws FileNotFoundException {
+        super(FindBasic);
+        solve();
+    }
+
+    public GaussJordan(Fraction[][] matrix, boolean FindBasic) {
+        super(matrix, FindBasic);
+        solve();
+    }
+
+    @Override
+    protected void printSolution(Fraction[][] matrix) {
         int m = matrix.length;
         int n = matrix[0].length - 1;
 
@@ -150,18 +189,8 @@ public class GaussJordan {
         }
     }
 
-    // Проверка, является ли строка нулевой (исключая последний столбец)
-    public static boolean isZeroRow(Fraction[] row, int n) {
-        for (int col = 0; col < n; col++) {
-            if (!row[col].equals(0.f)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Вывод уникального решения
-    private static void printUniqueSolution(Fraction[][] matrix) {
+    @Override
+    protected void printUniqueSolution(Fraction[][] matrix) {
         int m = matrix.length;
         int n = matrix[0].length - 1;
 
@@ -171,8 +200,8 @@ public class GaussJordan {
         }
     }
 
-    // Вывод решения в случае бесконечного количества решений
-    private static void printInfiniteSolutions(Fraction[][] matrix) {
+    @Override
+    protected void printInfiniteSolutions(Fraction[][] matrix) {
         int rows = matrix.length;
         int cols = matrix[0].length;
 
@@ -190,14 +219,5 @@ public class GaussJordan {
             }
         }
     }
-
-    // Поиск ведущего столбца (первого ненулевого элемента)
-    public static int findPivotColumn(Fraction[] row, int n) {
-        for (int col = 0; col < n; col++) {
-            if (row[col].equals(1.f)) {
-                return col;
-            }
-        }
-        return -1;
-    }
 }
+
