@@ -24,11 +24,24 @@ public class BasisSolutions {
             for (int j = i + 1; j < cols; j++) {
                 MakeBasicMatrix(i, j);
                 System.out.println("\nBasis of X" + (i+1) + " and X" + (j+1) + " in matrix");
-                GaussJordanBasis BasicMatrixSolve = new GaussJordanBasis(basicMatrix, false);
-                Solutions.add(BasicMatrixSolve.getSolution());
+                if (CheckLinearDependence()){
+                    System.out.println("System has linear dependence. It is a no solution.");
+                }else{
+                    GaussJordanBasis BasicMatrixSolve = new GaussJordanBasis(basicMatrix, false);
+                    Solutions.add(BasicMatrixSolve.getSolution());
+                }
             }
         }
         PrintResult();
+    }
+
+    private boolean CheckLinearDependence() {
+        for (int i = 0; i < rows; i++) {
+            if (LinearSystemSolver.isZeroRow(basicMatrix[i], cols)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void PrintResult() {
