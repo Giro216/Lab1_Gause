@@ -20,16 +20,19 @@ public class BasisSolutions {
     }
 
     private void FindBasis() {
+        List<Integer> indices = new ArrayList<>();
         for (int i = 0; i < cols; i++) {
-            for (int j = i + 1; j < cols; j++) {
-                MakeBasicMatrix(i, j);
-                System.out.println("\nBasis of X" + (i+1) + " and X" + (j+1) + " in matrix");
-                if (CheckLinearDependence()){
-                    System.out.println("System has linear dependence. It is a no solution.");
-                }else{
-                    GaussJordanBasis BasicMatrixSolve = new GaussJordanBasis(basicMatrix, false);
-                    Solutions.add(BasicMatrixSolve.getSolution());
-                }
+            indices.add(i);
+        }
+
+        for (List<Integer> basisIndices : getCombinations(indices, rows)) {
+            MakeBasicMatrix(basisIndices);
+            System.out.println("\nBasis in matrix for columns: " + basisIndices);
+            if (CheckLinearDependence()) {
+                System.out.println("System has linear dependence. It is a no solution.");
+            } else {
+                GaussJordanBasis BasicMatrixSolve = new GaussJordanBasis(basicMatrix, false);
+                Solutions.add(BasicMatrixSolve.getSolution());
             }
         }
         PrintResult();
@@ -46,22 +49,22 @@ public class BasisSolutions {
 
     private void PrintResult() {
         System.out.println("\nBasises:");
-        for (List<Fraction> result: Solutions ) {
+        for (List<Fraction> result : Solutions) {
             System.out.print("(");
-            for (Fraction fraction: result) {
+            for (Fraction fraction : result) {
                 System.out.print(fraction.toString() + " ");
             }
             System.out.println("\b)");
         }
     }
 
-    private void MakeBasicMatrix(int row, int col) {
+    private void MakeBasicMatrix(List<Integer> basisCols) {
         Fraction ZeroElement = new Fraction(0, 1);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols + 1; j++) {
-                if (j == row || j == col || (j == cols)) {
+                if (basisCols.contains(j) || j == cols) {
                     basicMatrix[i][j] = matrix[i][j];
-                }else{
+                } else {
                     basicMatrix[i][j] = ZeroElement;
                 }
             }
@@ -79,15 +82,33 @@ public class BasisSolutions {
     }
 
     private void RemoveRow(int rowToRemove) {
-        Fraction[][] newMatrix = new Fraction[rows - 1][cols];
+        Fraction[][] newMatrix = new Fraction[rows - 1][cols + 1];
 
         if (rowToRemove >= 0)
             System.arraycopy(matrix, 0, newMatrix, 0, rowToRemove);
 
         if (rows - (rowToRemove + 1) >= 0)
-            System.arraycopy(matrix, rowToRemove + 1, newMatrix, rowToRemove + 1 - 1, rows - (rowToRemove + 1));
+            System.arraycopy(matrix, rowToRemove + 1, newMatrix, rowToRemove, rows - (rowToRemove + 1));
 
         this.matrix = newMatrix;
         this.rows--;
+    }
+
+    private List<List<Integer>> getCombinations(List<Integer> elements, int combinations) {
+        List<List<Integer>> result = new ArrayList<>();
+        generateCombinations(elements, combinations, 0, new ArrayList<>(), result);
+        return result;
+    }
+
+    private void generateCombinations(List<Integer> elements, int comb_size, int start, List<Integer> current, List<List<Integer>> result) {
+        if (current.size() == comb_size) {
+            result.add(new ArrayList<>(current));
+            return;
+        }
+        for (int i = start; i < elements.size(); i++) {
+            current.add(elements.get(i));
+            generateCombinations(elements, comb_size, i + 1, current, result);
+            current.remove(current.size() - 1);
+        }
     }
 }
